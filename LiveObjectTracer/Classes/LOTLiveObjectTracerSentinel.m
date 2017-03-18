@@ -10,7 +10,7 @@
 {
     self = [super init];
     if (self) {
-        self.delegate = delegate;
+        _delegate = delegate;
         objc_setAssociatedObject(object, (__bridge void *)delegate, self, OBJC_ASSOCIATION_RETAIN);
     }
     return self;
@@ -26,8 +26,10 @@
 - (void)detachFromObject:(id)object
 {
     id <LOTLiveObjectTracerSentinelDelegate> delegate = self.delegate;
-    self.delegate = nil;
+    [self willChangeValueForKey:@"delegate"];
+    _delegate = nil;
     objc_setAssociatedObject(object, (__bridge void *)delegate, nil, OBJC_ASSOCIATION_RETAIN);
+    [self didChangeValueForKey:@"delegate"];
 }
 
 + (instancetype)addSentinelToObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate

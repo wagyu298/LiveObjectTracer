@@ -30,7 +30,7 @@
 @interface LOTLiveObjectTracerSentinel : NSObject
 
 /// @brief A delegate object
-@property (nonatomic, nullable, weak) id <LOTLiveObjectTracerSentinelDelegate> delegate;
+@property (nonatomic, nullable, weak, readonly) id <LOTLiveObjectTracerSentinelDelegate> delegate;
 
 /*!
  @brief Add the sentinel to the object.
