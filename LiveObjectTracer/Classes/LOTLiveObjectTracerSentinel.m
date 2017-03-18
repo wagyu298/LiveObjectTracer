@@ -23,6 +23,13 @@
     }
 }
 
+- (void)detachFromObject:(id)object
+{
+    id <LOTLiveObjectTracerSentinelDelegate> delegate = self.delegate;
+    self.delegate = nil;
+    objc_setAssociatedObject(object, (__bridge void *)delegate, nil, OBJC_ASSOCIATION_RETAIN);
+}
+
 + (instancetype)addSentinelToObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
 {
     LOTLiveObjectTracerSentinel *sentinel = [self sentinelWithObject:object delegate:delegate];
@@ -30,6 +37,15 @@
         return sentinel;
     }
     return [[LOTLiveObjectTracerSentinel alloc] initWithObject:object delegate:delegate];
+}
+
++ (void)removeSentinelFromObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
+{
+    LOTLiveObjectTracerSentinel *sentinel = [self sentinelWithObject:object delegate:delegate];
+    if (!sentinel) {
+        return;
+    }
+    [sentinel detachFromObject:object];
 }
 
 + (instancetype)sentinelWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate

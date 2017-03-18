@@ -90,6 +90,25 @@ describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
         
     });
     
+    describe(@"removeSentinelToObject", ^{
+        
+        it(@"removeSentinelToObject", ^{
+            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
+            
+            waitUntil(^(DoneCallback done) {
+                NSObject *target = [[NSObject alloc] init];
+                [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+                expect(delegate.delegateCalled).to.beFalsy();
+                [LOTLiveObjectTracerSentinel removeSentinelFromObject:target delegate:delegate];
+                expect(delegate.delegateCalled).to.beFalsy();
+                done();
+            });
+            
+            expect(delegate.delegateCalled).to.beFalsy();
+        });
+        
+    });
+
 });
 
 SpecEnd

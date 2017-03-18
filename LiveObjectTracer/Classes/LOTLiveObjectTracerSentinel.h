@@ -40,6 +40,13 @@
 + (instancetype _Nonnull)addSentinelToObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
 
 /*!
+ @brief Remove the sentinel from the object.
+ @param object An object to trace living
+ @param delegate A delegate object
+ */
++ (void)removeSentinelFromObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
+
+/*!
  @brief Returns the sentinel of the object if exist.
  @param object An object to trace living
  @param delegate A delegate object
