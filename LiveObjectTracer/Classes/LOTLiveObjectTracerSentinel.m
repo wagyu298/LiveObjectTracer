@@ -6,6 +6,20 @@
 
 static const char * const associatedKey = "LOTLiveObjectTracer";
 
+/*!
+ @brief Internal category
+ */
+@interface LOTLiveObjectTracerSentinel ()
+
+/*!
+ @brief Constructor with tracing target object and delegate object.
+ @param object An object to trace living
+ @param delegate A delegate object
+ */
+- (instancetype _Nonnull)initWithObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
+
+@end
+
 @implementation LOTLiveObjectTracerSentinel
 
 - (instancetype)initWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
@@ -25,10 +39,14 @@ static const char * const associatedKey = "LOTLiveObjectTracer";
     }
 }
 
-+ (instancetype)addSentinelToObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate
++ (instancetype)addSentinelToObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
 {
-    LOTLiveObjectTracerSentinel *sentinel __attribute__((unused)) = [[LOTLiveObjectTracerSentinel alloc] initWithObject:object delegate:delegate];
-    return sentinel;
+    return [[LOTLiveObjectTracerSentinel alloc] initWithObject:object delegate:delegate];
+}
+
++ (instancetype)sentinelWithObject:(id)object
+{
+    return (LOTLiveObjectTracerSentinel *)objc_getAssociatedObject(object, associatedKey);
 }
 
 @end

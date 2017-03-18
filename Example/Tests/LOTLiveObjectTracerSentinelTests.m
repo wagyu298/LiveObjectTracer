@@ -33,17 +33,34 @@ SpecBegin(LOTLiveObjectTracerSentinelTests)
 
 describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
     
-    it(@"Trace object", ^{
+    it(@"addSentinelToObject", ^{
         SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
         
         waitUntil(^(DoneCallback done) {
             NSObject *target = [[NSObject alloc] init];
-            LOTLiveObjectTracerSentinel *sentinel __attribute__((unused)) = [[LOTLiveObjectTracerSentinel alloc] initWithObject:target delegate:delegate];
+            [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
             expect(delegate.delegateCalled).to.beFalsy();
             done();
         });
         
         expect(delegate.delegateCalled).to.beTruthy();
+    });
+    
+    describe(@"sentinelWithObject", ^{
+        
+        it(@"Returns sentinel", ^{
+            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
+            NSObject *target = [[NSObject alloc] init];
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel sentinelWithObject:target];
+            expect(s1).to.equal(s2);
+        });
+        
+        it(@"Returns nil", ^{
+            NSObject *target = [[NSObject alloc] init];
+            LOTLiveObjectTracerSentinel *s = [LOTLiveObjectTracerSentinel sentinelWithObject:target];
+            expect(s).to.equal(nil);
+        });
     });
     
 });

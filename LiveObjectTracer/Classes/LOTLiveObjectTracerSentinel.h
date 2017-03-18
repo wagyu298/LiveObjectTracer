@@ -33,17 +33,16 @@
 @property (nonatomic, nullable, weak) id <LOTLiveObjectTracerSentinelDelegate> delegate;
 
 /*!
- @brief Constructor with tracing target object and delegate object.
- @param object An object to trace living
- @param delegate A delegate object
- */
-- (instancetype _Nonnull)initWithObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
-
-/*!
- @brief Helper method for attach the sentinel to the object.
+ @brief Add the sentinel to the object.
  @param object An object to trace living
  @param delegate A delegate object
  */
 + (instancetype _Nonnull)addSentinelToObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
+
+/*!
+ @brief Returns the sentinel of the object if exist.
+ @param object An object to trace living
+ */
++ (instancetype _Nullable)sentinelWithObject:(id _Nonnull)object;
 
 @end
