@@ -28,6 +28,7 @@ static const char * const associatedKey = "LOTLiveObjectTracer";
 + (instancetype)addSentinelToObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate
 {
     LOTLiveObjectTracerSentinel *sentinel __attribute__((unused)) = [[LOTLiveObjectTracerSentinel alloc] initWithObject:object delegate:delegate];
+    return sentinel;
 }
 
 @end
