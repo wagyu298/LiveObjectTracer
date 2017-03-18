@@ -46,4 +46,10 @@
  */
 - (void)addObject:(id _Nonnull)object;
 
+/*!
+ @brief Remove an object from count live objects.
+ @param object An object to manage
+ */
+- (void)removeObject:(id _Nonnull)object;
+
 @end

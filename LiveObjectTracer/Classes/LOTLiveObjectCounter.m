@@ -38,6 +38,26 @@
     }
 }
 
+- (void)removeObject:(id _Nonnull)object
+{
+    @synchronized (self) {
+        if (![LOTLiveObjectTracerSentinel sentinelWithObject:object delegate:self]) {
+            return;
+        }
+        
+        NSUInteger prev = _count;
+        [self willChangeValueForKey:@"count"];
+        [LOTLiveObjectTracerSentinel removeSentinelFromObject:object delegate:self];
+        _count--;
+        [self didChangeValueForKey:@"count"];
+        
+        if ([self.delegate respondsToSelector:@selector(lot_counter:didChangeCount:previousCount:)]) {
+            [self.delegate lot_counter:self didChangeCount:_count previousCount:prev];
+        }
+
+    }
+}
+
 - (void)lot_sentinelDidObjectReleased:(LOTLiveObjectTracerSentinel * _Nonnull)sentinel
 {
     @synchronized (self) {
