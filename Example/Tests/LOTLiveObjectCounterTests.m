@@ -57,6 +57,31 @@ describe(@"LOTLiveObjectCounterSpecs", ^{
             expect(counter.count).to.equal(0);
         });
         
+        it(@"Count duplicated objects", ^{
+            LOTLiveObjectCounter *counter = [[LOTLiveObjectCounter alloc] init];
+            expect(counter.count).to.equal(0);
+            
+            waitUntil(^(DoneCallback done) {
+                NSObject *target1 = [[NSObject alloc] init];
+                [counter addObject:target1];
+                expect(counter.count).to.equal(1);
+                
+                [counter addObject:target1];
+                expect(counter.count).to.equal(1);
+                
+                NSObject *target2 = [[NSObject alloc] init];
+                [counter addObject:target2];
+                expect(counter.count).to.equal(2);
+                
+                [counter addObject:target2];
+                expect(counter.count).to.equal(2);
+                
+                done();
+            });
+            
+            expect(counter.count).to.equal(0);
+        });
+        
     });
     
     describe(@"w/ delegate", ^{

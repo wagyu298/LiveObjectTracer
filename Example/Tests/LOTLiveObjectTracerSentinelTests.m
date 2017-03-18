@@ -33,34 +33,61 @@ SpecBegin(LOTLiveObjectTracerSentinelTests)
 
 describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
     
-    it(@"addSentinelToObject", ^{
-        SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
-        
-        waitUntil(^(DoneCallback done) {
-            NSObject *target = [[NSObject alloc] init];
-            [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
-            expect(delegate.delegateCalled).to.beFalsy();
-            done();
+    describe(@"addSentinelToObject", ^{
+
+        it(@"addSentinelToObject", ^{
+            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
+            
+            waitUntil(^(DoneCallback done) {
+                NSObject *target = [[NSObject alloc] init];
+                [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+                expect(delegate.delegateCalled).to.beFalsy();
+                done();
+            });
+            
+            expect(delegate.delegateCalled).to.beTruthy();
         });
         
-        expect(delegate.delegateCalled).to.beTruthy();
-    });
-    
-    describe(@"sentinelWithObject", ^{
-        
-        it(@"Returns sentinel", ^{
+        it(@"Same sentinal for same delegate", ^{
             SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
             NSObject *target = [[NSObject alloc] init];
+            
             LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
-            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel sentinelWithObject:target];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
             expect(s1).to.equal(s2);
         });
         
-        it(@"Returns nil", ^{
+        it(@"Differ sentinal for differ delegate", ^{
+            SentinelDelegate *delegate1 = [[SentinelDelegate alloc] init];
+            SentinelDelegate *delegate2 = [[SentinelDelegate alloc] init];
             NSObject *target = [[NSObject alloc] init];
-            LOTLiveObjectTracerSentinel *s = [LOTLiveObjectTracerSentinel sentinelWithObject:target];
-            expect(s).to.equal(nil);
+            
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate1];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate2];
+            expect(s1).notTo.equal(s2);
         });
+        
+        it(@"Differ sentinal for differ target", ^{
+            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
+            NSObject *target1 = [[NSObject alloc] init];
+            NSObject *target2 = [[NSObject alloc] init];
+            
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target1 delegate:delegate];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target2 delegate:delegate];
+            expect(s1).notTo.equal(s2);
+        });
+        
+        it(@"Differ sentinal for differ target and delegate", ^{
+            SentinelDelegate *delegate1 = [[SentinelDelegate alloc] init];
+            SentinelDelegate *delegate2 = [[SentinelDelegate alloc] init];
+            NSObject *target1 = [[NSObject alloc] init];
+            NSObject *target2 = [[NSObject alloc] init];
+            
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target1 delegate:delegate1];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target2 delegate:delegate2];
+            expect(s1).notTo.equal(s2);
+        });
+        
     });
     
 });

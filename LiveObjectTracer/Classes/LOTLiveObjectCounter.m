@@ -22,6 +22,10 @@
 - (void)addObject:(id)object
 {
     @synchronized (self) {
+        if ([LOTLiveObjectTracerSentinel sentinelWithObject:object delegate:self]) {
+            return;
+        }
+        
         NSUInteger prev = _count;
         [self willChangeValueForKey:@"count"];
         [LOTLiveObjectTracerSentinel addSentinelToObject:object delegate:self];
