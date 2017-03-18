@@ -42,7 +42,8 @@
 /*!
  @brief Returns the sentinel of the object if exist.
  @param object An object to trace living
+ @param delegate A delegate object
  */
-+ (instancetype _Nullable)sentinelWithObject:(id _Nonnull)object;
++ (instancetype _Nullable)sentinelWithObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
 
 @end

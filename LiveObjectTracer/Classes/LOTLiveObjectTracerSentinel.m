@@ -4,22 +4,6 @@
 #import <objc/runtime.h>
 #import "LOTLiveObjectTracerSentinel.h"
 
-static const char * const associatedKey = "LOTLiveObjectTracer";
-
-/*!
- @brief Internal category
- */
-@interface LOTLiveObjectTracerSentinel ()
-
-/*!
- @brief Constructor with tracing target object and delegate object.
- @param object An object to trace living
- @param delegate A delegate object
- */
-- (instancetype _Nonnull)initWithObject:(id _Nonnull)object delegate:(id <LOTLiveObjectTracerSentinelDelegate> _Nonnull)delegate;
-
-@end
-
 @implementation LOTLiveObjectTracerSentinel
 
 - (instancetype)initWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
@@ -27,7 +11,7 @@ static const char * const associatedKey = "LOTLiveObjectTracer";
     self = [super init];
     if (self) {
         self.delegate = delegate;
-        objc_setAssociatedObject(object, associatedKey, self, OBJC_ASSOCIATION_RETAIN);
+        objc_setAssociatedObject(object, (__bridge void *)delegate, self, OBJC_ASSOCIATION_RETAIN);
     }
     return self;
 }
@@ -41,12 +25,17 @@ static const char * const associatedKey = "LOTLiveObjectTracer";
 
 + (instancetype)addSentinelToObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
 {
+    LOTLiveObjectTracerSentinel *sentinel = [self sentinelWithObject:object delegate:delegate];
+    if (sentinel) {
+        return sentinel;
+    }
     return [[LOTLiveObjectTracerSentinel alloc] initWithObject:object delegate:delegate];
 }
 
-+ (instancetype)sentinelWithObject:(id)object
++ (instancetype)sentinelWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
+
 {
-    return (LOTLiveObjectTracerSentinel *)objc_getAssociatedObject(object, associatedKey);
+    return (LOTLiveObjectTracerSentinel *)objc_getAssociatedObject(object, (__bridge void *)delegate);
 }
 
 @end
