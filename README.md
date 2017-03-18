@@ -18,10 +18,6 @@ Thank you stackoverflow and users!
 [![License](https://img.shields.io/cocoapods/l/LiveObjectTracer.svg?style=flat)](http://cocoapods.org/pods/LiveObjectTracer)
 [![Platform](https://img.shields.io/cocoapods/p/LiveObjectTracer.svg?style=flat)](http://cocoapods.org/pods/LiveObjectTracer)
 
-## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
 ## Requirements
 
 iOS8 or later
