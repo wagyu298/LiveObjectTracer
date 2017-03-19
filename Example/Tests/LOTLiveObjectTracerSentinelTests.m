@@ -3,63 +3,84 @@
 
 #import <Expecta/Expecta.h>
 #import <Specta/Specta.h>
+#import <OCMock/OCMock.h>
 #import <LiveObjectTracer/LiveObjectTracer.h>
-
-@interface SentinelDelegate: NSObject <LOTLiveObjectTracerSentinelDelegate>
-
-@property (nonatomic) BOOL delegateCalled;
-
-@end
-
-@implementation SentinelDelegate
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.delegateCalled = NO;
-    }
-    return self;
-}
-
-- (void)lot_sentinelDidObjectReleased:(LOTLiveObjectTracerSentinel *)sentinel
-{
-    self.delegateCalled = YES;
-}
-
-@end
 
 SpecBegin(LOTLiveObjectTracerSentinelTests)
 
 describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
-    
-    describe(@"addSentinelToObject", ^{
-
+    describe(@"w/ mock", ^{
+        __block id delegate;
+        __block int nDelegateCalled;
+        
+        beforeEach(^{
+            delegate = OCMProtocolMock(@protocol(LOTLiveObjectTracerSentinelDelegate));
+            OCMStub([delegate lot_sentinelDidObjectReleased:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+                // NOTE retainArguments required because lot_sentinelDidObjectReleased called from
+                // dealloc method.
+                [invocation retainArguments];
+                nDelegateCalled++;
+            });
+            nDelegateCalled = 0;
+        });
+        
+        afterEach(^{
+            delegate = nil;
+        });
+        
         it(@"addSentinelToObject", ^{
-            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
-            
             waitUntil(^(DoneCallback done) {
                 NSObject *target = [[NSObject alloc] init];
                 [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
-                expect(delegate.delegateCalled).to.beFalsy();
+                expect(nDelegateCalled).to.equal(0);
+                done();
+            });
+            expect(nDelegateCalled).to.equal(1);
+        });
+        
+        it(@"removeSentinelToObject", ^{
+            waitUntil(^(DoneCallback done) {
+                NSObject *target = [[NSObject alloc] init];
+                [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+                expect(nDelegateCalled).to.equal(0);
+                [LOTLiveObjectTracerSentinel removeSentinelFromObject:target delegate:delegate];
+                expect(nDelegateCalled).to.equal(0);
                 done();
             });
             
-            expect(delegate.delegateCalled).to.beTruthy();
+            expect(nDelegateCalled).to.equal(0);
+        });
+    
+    });
+
+    describe(@"addSentinelToObject", ^{
+        __block id delegate1, delegate2;
+        
+        beforeEach(^{
+            delegate1 = OCMProtocolMock(@protocol(LOTLiveObjectTracerSentinelDelegate));
+            OCMStub([delegate1 lot_sentinelDidObjectReleased:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+                [invocation retainArguments];
+            });
+            delegate2 = OCMProtocolMock(@protocol(LOTLiveObjectTracerSentinelDelegate));
+            OCMStub([delegate2 lot_sentinelDidObjectReleased:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+                [invocation retainArguments];
+            });
         });
         
+        afterEach(^{
+            delegate1 = nil;
+            delegate2 = nil;
+        });
+
         it(@"Same sentinal for same delegate", ^{
-            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
             NSObject *target = [[NSObject alloc] init];
             
-            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
-            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate1];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate1];
             expect(s1).to.equal(s2);
         });
         
         it(@"Differ sentinal for differ delegate", ^{
-            SentinelDelegate *delegate1 = [[SentinelDelegate alloc] init];
-            SentinelDelegate *delegate2 = [[SentinelDelegate alloc] init];
             NSObject *target = [[NSObject alloc] init];
             
             LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate1];
@@ -68,18 +89,15 @@ describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
         });
         
         it(@"Differ sentinal for differ target", ^{
-            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
             NSObject *target1 = [[NSObject alloc] init];
             NSObject *target2 = [[NSObject alloc] init];
             
-            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target1 delegate:delegate];
-            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target2 delegate:delegate];
+            LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target1 delegate:delegate1];
+            LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target2 delegate:delegate1];
             expect(s1).notTo.equal(s2);
         });
         
         it(@"Differ sentinal for differ target and delegate", ^{
-            SentinelDelegate *delegate1 = [[SentinelDelegate alloc] init];
-            SentinelDelegate *delegate2 = [[SentinelDelegate alloc] init];
             NSObject *target1 = [[NSObject alloc] init];
             NSObject *target2 = [[NSObject alloc] init];
             
@@ -90,25 +108,6 @@ describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
         
     });
     
-    describe(@"removeSentinelToObject", ^{
-        
-        it(@"removeSentinelToObject", ^{
-            SentinelDelegate *delegate = [[SentinelDelegate alloc] init];
-            
-            waitUntil(^(DoneCallback done) {
-                NSObject *target = [[NSObject alloc] init];
-                [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
-                expect(delegate.delegateCalled).to.beFalsy();
-                [LOTLiveObjectTracerSentinel removeSentinelFromObject:target delegate:delegate];
-                expect(delegate.delegateCalled).to.beFalsy();
-                done();
-            });
-            
-            expect(delegate.delegateCalled).to.beFalsy();
-        });
-        
-    });
-
 });
 
 SpecEnd

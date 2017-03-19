@@ -3,37 +3,8 @@
 
 #import <Expecta/Expecta.h>
 #import <Specta/Specta.h>
+#import <OCMock/OCMock.h>
 #import <LiveObjectTracer/LiveObjectTracer.h>
-
-@interface CounterDelegate: NSObject <LOTLiveObjectCounterDelegate>
-
-@property (nonatomic) BOOL delegateCalled;
-@property (nonatomic) NSUInteger count;
-@property (nonatomic) NSUInteger previousCount;
-
-@end
-
-@implementation CounterDelegate
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.delegateCalled = NO;
-        self.count = 0;
-        self.previousCount = 0;
-    }
-    return self;
-}
-
-- (void)lot_counter:(LOTLiveObjectCounter *)counter didChangeCount:(NSUInteger)count previousCount:(NSUInteger)previousCount
-{
-    self.delegateCalled = YES;
-    self.count = count;
-    self.previousCount = previousCount;
-}
-
-@end
 
 SpecBegin(LOTLiveObjectCounterTests)
 
@@ -92,7 +63,8 @@ describe(@"LOTLiveObjectCounterSpecs", ^{
         describe(@"w/ delegate", ^{
             
             it(@"Count objects", ^{
-                CounterDelegate *delegate = [[CounterDelegate alloc] init];
+                id delegate = OCMProtocolMock(@protocol(LOTLiveObjectCounterDelegate));
+                OCMStub([delegate lot_counter:[OCMArg any] didChangeCount:0 previousCount:0]).andDo(nil);
                 LOTLiveObjectCounter *counter = [[LOTLiveObjectCounter alloc] initWithDelegate:delegate];
                 expect(counter.count).to.equal(0);
                 
@@ -100,22 +72,18 @@ describe(@"LOTLiveObjectCounterSpecs", ^{
                     NSObject *target1 = [[NSObject alloc] init];
                     [counter addObject:target1];
                     expect(counter.count).to.equal(1);
-                    expect(delegate.count).to.equal(counter.count);
-                    expect(delegate.previousCount).to.equal(0);
+                    OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:1 previousCount:0]);
                     
                     NSObject *target2 = [[NSObject alloc] init];
                     [counter addObject:target2];
                     expect(counter.count).to.equal(2);
-                    
-                    expect(delegate.count).to.equal(counter.count);
-                    expect(delegate.previousCount).to.equal(1);
+                    OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:2 previousCount:1]);
                     
                     done();
                 });
                 
                 expect(counter.count).to.equal(0);
-                expect(delegate.count).to.equal(0);
-                expect(delegate.previousCount).to.equal(1);
+                OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:0 previousCount:1]);
             });
             
         });
@@ -125,27 +93,24 @@ describe(@"LOTLiveObjectCounterSpecs", ^{
     describe(@"removeObject", ^{
         
         it(@"Remove with delegate call", ^{
-            CounterDelegate *delegate = [[CounterDelegate alloc] init];
+            id delegate = OCMProtocolMock(@protocol(LOTLiveObjectCounterDelegate));
+            OCMStub([delegate lot_counter:[OCMArg any] didChangeCount:0 previousCount:0]).andDo(nil);
             LOTLiveObjectCounter *counter = [[LOTLiveObjectCounter alloc] initWithDelegate:delegate];
             expect(counter.count).to.equal(0);
             
             NSObject *target1 = [[NSObject alloc] init];
             [counter addObject:target1];
             expect(counter.count).to.equal(1);
-            expect(delegate.count).to.equal(1);
-            expect(delegate.previousCount).to.equal(0);
-            expect(delegate.delegateCalled).to.equal(YES);
+            OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:1 previousCount:0]);
             
-            delegate.delegateCalled = NO;
             [counter removeObject:target1];
             expect(counter.count).to.equal(0);
-            expect(delegate.count).to.equal(0);
-            expect(delegate.previousCount).to.equal(1);
-            expect(delegate.delegateCalled).to.equal(YES);
+            OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:0 previousCount:1]);
         });
         
         it(@"Count objects", ^{
-            CounterDelegate *delegate = [[CounterDelegate alloc] init];
+            id delegate = OCMProtocolMock(@protocol(LOTLiveObjectCounterDelegate));
+            OCMStub([delegate lot_counter:[OCMArg any] didChangeCount:0 previousCount:0]).andDo(nil);
             LOTLiveObjectCounter *counter = [[LOTLiveObjectCounter alloc] initWithDelegate:delegate];
             expect(counter.count).to.equal(0);
             
@@ -153,24 +118,22 @@ describe(@"LOTLiveObjectCounterSpecs", ^{
                 NSObject *target1 = [[NSObject alloc] init];
                 [counter addObject:target1];
                 expect(counter.count).to.equal(1);
+                OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:1 previousCount:0]);
                 
                 NSObject *target2 = [[NSObject alloc] init];
                 [counter addObject:target2];
                 expect(counter.count).to.equal(2);
-                expect(delegate.count).to.equal(2);
-                expect(delegate.previousCount).to.equal(1);
+                OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:2 previousCount:1]);
                 
                 [counter removeObject:target2];
                 expect(counter.count).to.equal(1);
-                expect(delegate.count).to.equal(1);
-                expect(delegate.previousCount).to.equal(2);
+                OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:1 previousCount:2]);
                 
                 done();
             });
             
             expect(counter.count).to.equal(0);
-            expect(delegate.count).to.equal(0);
-            expect(delegate.previousCount).to.equal(1);
+            OCMVerify([delegate lot_counter:OCMOCK_ANY didChangeCount:0 previousCount:1]);
         });
         
     });

@@ -3,31 +3,8 @@
 
 #import <Expecta/Expecta.h>
 #import <Specta/Specta.h>
+#import <OCMock/OCMock.h>
 #import <LiveObjectTracer/LiveObjectTracer.h>
-
-@interface TracerDelegate: NSObject <LOTLiveObjectTracerDelegate>
-
-@property (nonatomic) BOOL delegateCalled;
-
-@end
-
-@implementation TracerDelegate
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.delegateCalled = NO;
-    }
-    return self;
-}
-
-- (void)lot_tracerDidObjectReleased:(LOTLiveObjectTracer *)tracer
-{
-    self.delegateCalled = YES;
-}
-
-@end
 
 SpecBegin(LOTLiveObjectTracerTests)
 
@@ -57,12 +34,13 @@ describe(@"LOTLiveObjectTracerSpecs", ^{
     describe(@"w/ delegate", ^{
         
         it(@"Live or dead", ^{
-            TracerDelegate *delegate = [[TracerDelegate alloc] init];
+            id delegateMock = OCMProtocolMock(@protocol(LOTLiveObjectTracerDelegate));
+            OCMStub([delegateMock lot_tracerDidObjectReleased:[OCMArg any]]).andDo(nil);
             __block LOTLiveObjectTracer *tracer;
             
             waitUntil(^(DoneCallback done) {
                 NSObject *target = [[NSObject alloc] init];
-                tracer = [[LOTLiveObjectTracer alloc] initWithObject:target delegate:delegate];
+                tracer = [[LOTLiveObjectTracer alloc] initWithObject:target delegate:delegateMock];
                 expect(tracer.live).to.beTruthy();
                 expect(tracer.dead).to.beFalsy();
                 done();
@@ -70,7 +48,7 @@ describe(@"LOTLiveObjectTracerSpecs", ^{
             
             expect(tracer.live).to.beFalsy();
             expect(tracer.dead).to.beTruthy();
-            expect(delegate.delegateCalled).to.beTruthy();
+            OCMVerify([delegateMock lot_tracerDidObjectReleased:OCMOCK_ANY]);
             
             tracer = nil;
         });
