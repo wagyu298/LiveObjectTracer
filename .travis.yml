@@ -9,6 +9,7 @@ podfile: Example/Podfile
 before_install:
   - rvm get head
   - gem install cocoapods # Since Travis is not always on latest version
+  - pod repo update
   - pod install --project-directory=Example
   - open -a "simulator" --args -CurrentDeviceUDID `instruments -s devices | sed -n '/^iPhone 6s (10\.0) \[\(.*\)\].*$/s//\1/p'`
 script:
