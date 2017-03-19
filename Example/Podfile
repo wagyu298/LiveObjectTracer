@@ -7,6 +7,7 @@ target 'LiveObjectTracer_Example' do
     inherit! :search_paths
 
     pod 'Specta'
-  pod 'Expecta'
+    pod 'Expecta'
+    pod 'OCMock'
   end
 end
