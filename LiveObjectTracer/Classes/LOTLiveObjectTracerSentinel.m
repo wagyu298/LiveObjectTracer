@@ -10,6 +10,9 @@
 {
     self = [super init];
     if (self) {
+        if (object == delegate) {
+            [NSException raise:@"LOLLiveObjectTracerSentinelInvalidArgumentException" format:@"object and delegate is same object: %@", object];
+        }
         _delegate = delegate;
         objc_setAssociatedObject(object, (__bridge void *)delegate, self, OBJC_ASSOCIATION_RETAIN);
     }
@@ -44,10 +47,9 @@
 + (void)removeSentinelFromObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
 {
     LOTLiveObjectTracerSentinel *sentinel = [self sentinelWithObject:object delegate:delegate];
-    if (!sentinel) {
-        return;
+    if (sentinel) {
+        [sentinel detachFromObject:object];
     }
-    [sentinel detachFromObject:object];
 }
 
 + (instancetype)sentinelWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
