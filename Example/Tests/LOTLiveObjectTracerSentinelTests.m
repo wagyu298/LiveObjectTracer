@@ -9,6 +9,7 @@
 SpecBegin(LOTLiveObjectTracerSentinelTests)
 
 describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
+    
     describe(@"w/ mock", ^{
         __block id delegate;
         __block int nDelegateCalled;
@@ -104,6 +105,28 @@ describe(@"LOTLiveObjectTracerSentinelSpecs", ^{
             LOTLiveObjectTracerSentinel *s1 = [LOTLiveObjectTracerSentinel addSentinelToObject:target1 delegate:delegate1];
             LOTLiveObjectTracerSentinel *s2 = [LOTLiveObjectTracerSentinel addSentinelToObject:target2 delegate:delegate2];
             expect(s1).notTo.equal(s2);
+        });
+        
+    });
+    
+    describe(@"LOLLiveObjectTracerSentinelInvalidArgumentException", ^{
+        
+        it(@"Throw w/ same object", ^{
+            id delegate = OCMProtocolMock(@protocol(LOTLiveObjectTracerSentinelDelegate));
+            expect(^{
+                [LOTLiveObjectTracerSentinel addSentinelToObject:delegate delegate:delegate];
+            }).to.raise(@"LOLLiveObjectTracerSentinelInvalidArgumentException");
+        });
+        
+        it(@"Not throw w/o same object", ^{
+            id delegate = OCMProtocolMock(@protocol(LOTLiveObjectTracerSentinelDelegate));
+            OCMStub([delegate lot_sentinelDidObjectReleased:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+                [invocation retainArguments];
+            });
+            NSObject *target = [[NSObject alloc] init];
+            expect(^{
+                [LOTLiveObjectTracerSentinel addSentinelToObject:target delegate:delegate];
+            }).notTo.raiseAny();
         });
         
     });

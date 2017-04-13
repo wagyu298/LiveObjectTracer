@@ -10,6 +10,9 @@
 {
     self = [super init];
     if (self) {
+        if (object == delegate) {
+            [NSException raise:@"LOLLiveObjectTracerSentinelInvalidArgumentException" format:@"object and delegate is same object: %@", object];
+        }
         _delegate = delegate;
         objc_setAssociatedObject(object, (__bridge void *)delegate, self, OBJC_ASSOCIATION_RETAIN);
     }
