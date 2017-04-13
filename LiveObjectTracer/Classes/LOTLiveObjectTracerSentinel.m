@@ -44,10 +44,9 @@
 + (void)removeSentinelFromObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
 {
     LOTLiveObjectTracerSentinel *sentinel = [self sentinelWithObject:object delegate:delegate];
-    if (!sentinel) {
-        return;
+    if (sentinel) {
+        [sentinel detachFromObject:object];
     }
-    [sentinel detachFromObject:object];
 }
 
 + (instancetype)sentinelWithObject:(id)object delegate:(id <LOTLiveObjectTracerSentinelDelegate>)delegate
