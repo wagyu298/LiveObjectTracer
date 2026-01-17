@@ -4,7 +4,7 @@ Library to notice you when the NSObject or subclass object was deallocated
 I was tried to let some actions when the object was deallocated.
 LiveObjectTracer is one of the solution for it.
 
-It trigger delegate method when the NSObject or subclass object was deallocated.
+It triggers a delegate method when the NSObject or subclass object was deallocated.
 The object includes all of the NSObject subclasses,
 your made and third party made and Apple made.
 You can use this library to any situations.
@@ -19,7 +19,7 @@ Thank you stackoverflow and users!
 
 ## Requirements
 
-iOS8 or later
+iOS12 or later
 
 ## Installation
 
@@ -27,7 +27,7 @@ LiveObjectTracer is available through [CocoaPods](http://cocoapods.org). To inst
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "LiveObjectTracer"
+pod "LiveObjectTracer", :git => 'https://github.com/wagyu298/LiveObjectTracer'
 ```
 
 ## Author
