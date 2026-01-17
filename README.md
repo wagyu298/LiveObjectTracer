@@ -13,7 +13,6 @@ I got core concept of LiveObjectTracer from
 [Want to perform action when \_\_weak ivar is niled](http://stackoverflow.com/questions/14957382/want-to-perform-action-when-weak-ivar-is-niled).
 Thank you stackoverflow and users!
 
-[![CI Status](http://img.shields.io/travis/wagyu298/LiveObjectTracer.svg?style=flat)](https://travis-ci.org/wagyu298/LiveObjectTracer)
 [![Version](https://img.shields.io/cocoapods/v/LiveObjectTracer.svg?style=flat)](http://cocoapods.org/pods/LiveObjectTracer)
 [![License](https://img.shields.io/cocoapods/l/LiveObjectTracer.svg?style=flat)](http://cocoapods.org/pods/LiveObjectTracer)
 [![Platform](https://img.shields.io/cocoapods/p/LiveObjectTracer.svg?style=flat)](http://cocoapods.org/pods/LiveObjectTracer)
