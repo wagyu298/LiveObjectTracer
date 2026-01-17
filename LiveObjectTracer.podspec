@@ -38,13 +38,13 @@ Thank you stackoverflow and users!
   s.source           = { :git => 'https://github.com/wagyu298/LiveObjectTracer.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/wagyu298'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '12.0'
 
-  s.source_files = 'LiveObjectTracer/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'LiveObjectTracer' => ['LiveObjectTracer/Assets/*.png']
-  # }
+  s.source_files = 'LiveObjectTracer/Classes/**/*.{h,m}'
+
+  s.resource_bundles = {
+    'LiveObjectTracer' => ['LiveObjectTracer/Classes/PrivacyInfo.xcprivacy']
+  }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
