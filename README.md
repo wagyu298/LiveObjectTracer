@@ -27,7 +27,7 @@ LiveObjectTracer is available through [CocoaPods](http://cocoapods.org). To inst
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "LiveObjectTracer", :git => 'https://github.com/wagyu298/LiveObjectTracer'
+pod 'LiveObjectTracer', :git => 'https://github.com/wagyu298/LiveObjectTracer.git'
 ```
 
 ## Author
